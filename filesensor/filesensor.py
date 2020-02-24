@@ -3,8 +3,11 @@ import asyncio
 from operator import itemgetter
 from functools import lru_cache
 
-class FileSensor():
+from .factory import ObjectFactory
+
+class FileSensor(ObjectFactory):
 	def __init__(self, path, update_frequency = 1):
+		ObjectFactory.__init__(self)
 		self.path = path
 		self.update_frequency = update_frequency # In Seconds
 		self.state=True
@@ -24,18 +27,21 @@ class FileSensor():
 
 
 	async def watch(self):
-		initial_max_changed_ts = self.get_metadata(self.path)[0][8]
+		initial_details = self.get_metadata(self.path)
+		initial_max_changed_ts = self.get_metadata(self.path)[0][8] if len(initial_details) else 0
 
 		while self.state:
 			updated_details = self.get_metadata(self.path)
-			updated_max_changed_ts = updated_details[0][8]
-			if (updated_max_changed_ts > initial_max_changed_ts):
-				for details in updated_details:
-					if(details[8] > initial_max_changed_ts):
-						print(os.path.join(self.path, dict(self.file_map).get(details[1])))
-						print(self.get_file_map.cache_info())
-					break
-				initial_max_changed_ts=updated_max_changed_ts
-			await asyncio.sleep(self.update_frequency)
+			if len(updated_details):
+				updated_max_changed_ts = updated_details[0][8]
+				if (updated_max_changed_ts > initial_max_changed_ts):
+					for details in updated_details:
+						if(details[8] > initial_max_changed_ts):
+							print("debugger")
+							for key, value in self._actions.items():
+								print(f"executing action : {key}")
+								value.run(self.path, self.file_map, details)
+					initial_max_changed_ts=updated_max_changed_ts
+				await asyncio.sleep(self.update_frequency)
 
  
