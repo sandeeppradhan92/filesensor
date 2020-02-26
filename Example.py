@@ -4,7 +4,7 @@ from filesensor import FileSensor, default_actions, exec, create_task
 def create_async_tasks(path_list):	
 	tasks = []
 	for path in path_list:
-		filesensor = FileSensor(path)
+		filesensor = FileSensor.createObject(path, 'local')
 		filesensor.register_action_all(default_actions)
 		task = create_task(filesensor)
 		tasks.append(task)

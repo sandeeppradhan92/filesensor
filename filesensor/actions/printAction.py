@@ -1,8 +1,6 @@
-import os
+from ..factory import ActionFactory
 
-from .factory import ActionFactory
-
-class PrintValues():
+class PrintValues(ActionFactory):
     def run(self, path, file_map, details):
         try:
             print(path, dict(file_map), details, details[1])
@@ -10,6 +8,3 @@ class PrintValues():
             print(f"error message:{identifier}")
 
 
-default_actions = {
-    'print' : PrintValues()
-}
